@@ -24,8 +24,6 @@ on:
     secrets:
       OPENAI_TOKEN:
         required: true
-      GITHUB_TOKEN:
-        required: true
 
 permissions:
   contents: write
@@ -46,9 +44,9 @@ jobs:
       - name: Checkout Task3 Repository
         uses: actions/checkout@v3
         with:
-          repository: 'alinda-24/task3'  # Corrected repository reference
+          repository: 'alinda-24/task3'  # Correct repository reference
           path: 'task3-workflows'        # Changed path to avoid confusion
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}      # Use github.token instead of secrets.GITHUB_TOKEN
           fetch-depth: 1
 
       - name: Set Up Python
@@ -65,7 +63,6 @@ jobs:
         id: generate-task-description
         env:
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TASK_DIFFICULTY: ${{ inputs.difficulty }}
           TASK_THEME: ${{ inputs.theme }}
           TASK_LANGUAGE: ${{ inputs.language }}
@@ -92,9 +89,9 @@ jobs:
       - name: Checkout Task3 Repository
         uses: actions/checkout@v3
         with:
-          repository: 'alinda-24/task3'  # Corrected repository reference
+          repository: 'alinda-24/task3'  # Correct repository reference
           path: 'task3-workflows'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}      # Use github.token instead of secrets.GITHUB_TOKEN
           fetch-depth: 1
 
       - name: Set Up Python
@@ -111,7 +108,6 @@ jobs:
         id: generate-solution
         env:
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python task3-workflows/scripts/generate_solution.py "${{ secrets.OPENAI_TOKEN }}" "${{ needs.generate-task-description.outputs.branch_name }}"
 
@@ -141,9 +137,9 @@ jobs:
       - name: Checkout Task3 Repository
         uses: actions/checkout@v3
         with:
-          repository: 'alinda-24/task3'  # Corrected repository reference
+          repository: 'alinda-24/task3'  # Correct repository reference
           path: 'task3-workflows'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}      # Use github.token instead of secrets.GITHUB_TOKEN
           fetch-depth: 1
 
       - name: Set Up Python
@@ -160,7 +156,6 @@ jobs:
         id: generate-tests
         env:
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python task3-workflows/scripts/generate_tests.py "${{ secrets.OPENAI_TOKEN }}" "${{ needs.generate-solution.outputs.branch_name }}"
 
@@ -188,9 +183,9 @@ jobs:
       - name: Checkout Task3 Repository
         uses: actions/checkout@v3
         with:
-          repository: 'alinda-24/task3'  # Corrected repository reference
+          repository: 'alinda-24/task3'  # Correct repository reference
           path: 'task3-workflows'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}      # Use github.token instead of secrets.GITHUB_TOKEN
           fetch-depth: 1
 
       - name: Set Up Python
@@ -206,7 +201,6 @@ jobs:
       - name: Adversarial Review - Improve Solution
         env:
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python task3-workflows/scripts/adversarial_review.py "${{ secrets.OPENAI_TOKEN }}" "tasks/new_task.md" ".hidden_tasks"
 
@@ -224,9 +218,9 @@ jobs:
       - name: Checkout Task3 Repository
         uses: actions/checkout@v3
         with:
-          repository: 'alinda-24/task3'  # Corrected repository reference
+          repository: 'alinda-24/task3'  # Correct repository reference
           path: 'task3-workflows'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}      # Use github.token instead of secrets.GITHUB_TOKEN
           fetch-depth: 1
 
       - name: Set Up Python
@@ -242,7 +236,6 @@ jobs:
       - name: Adversarial Review - Improve Tests
         env:
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python task3-workflows/scripts/adversarial_tests.py "${{ secrets.OPENAI_TOKEN }}" "gen_test"
 
@@ -260,9 +253,9 @@ jobs:
       - name: Checkout Task3 Repository
         uses: actions/checkout@v3
         with:
-          repository: 'alinda-24/task3'  # Corrected repository reference
+          repository: 'alinda-24/task3'  # Correct repository reference
           path: 'task3-workflows'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}      # Use github.token instead of secrets.GITHUB_TOKEN
           fetch-depth: 1
 
       - name: Set Up Python
@@ -278,6 +271,5 @@ jobs:
       - name: Generate Template Code
         env:
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python task3-workflows/scripts/generate_template_code.py "${{ secrets.OPENAI_TOKEN }}" "${{ needs.adversarial-review.outputs.branch_name }}"
