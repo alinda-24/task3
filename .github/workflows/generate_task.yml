@@ -1,4 +1,4 @@
-# shared-workflows/.github/workflows/generate_task.yml
+# task3/.github/workflows/generate_task.yml
 
 name: Generate Task Workflow
 
@@ -43,11 +43,11 @@ jobs:
         with:
           fetch-depth: 0  # Ensure full history for branch operations
 
-      - name: Checkout Shared Workflows Repository
+      - name: Checkout Task3 Repository
         uses: actions/checkout@v3
         with:
-          repository: 'alinda-24/shared-workflows'  # Replace with your username/org and repo
-          path: 'shared-workflows'
+          repository: 'alinda-24/task3'  # Corrected repository reference
+          path: 'task3-workflows'        # Changed path to avoid confusion
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 1
 
@@ -70,7 +70,7 @@ jobs:
           TASK_THEME: ${{ inputs.theme }}
           TASK_LANGUAGE: ${{ inputs.language }}
         run: |
-          python shared-workflows/scripts/generate_task_description.py "${{ secrets.OPENAI_TOKEN }}"
+          python task3-workflows/scripts/generate_task_description.py "${{ secrets.OPENAI_TOKEN }}"
 
       - name: Set Branch Name
         id: set-branch-name
@@ -89,11 +89,11 @@ jobs:
           ref: ${{ needs.generate-task-description.outputs.branch_name }}
           fetch-depth: 0  # Ensure full history
 
-      - name: Checkout Shared Workflows Repository
+      - name: Checkout Task3 Repository
         uses: actions/checkout@v3
         with:
-          repository: 'alinda-24/shared-workflows'  # Replace with your username/org and repo
-          path: 'shared-workflows'
+          repository: 'alinda-24/task3'  # Corrected repository reference
+          path: 'task3-workflows'
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 1
 
@@ -113,7 +113,7 @@ jobs:
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python shared-workflows/scripts/generate_solution.py "${{ secrets.OPENAI_TOKEN }}" "${{ needs.generate-task-description.outputs.branch_name }}"
+          python task3-workflows/scripts/generate_solution.py "${{ secrets.OPENAI_TOKEN }}" "${{ needs.generate-task-description.outputs.branch_name }}"
 
       - name: Set Branch Name
         id: set-branch-name
@@ -138,11 +138,11 @@ jobs:
           ref: ${{ needs.generate-solution.outputs.branch_name }}
           fetch-depth: 0  # Ensure full history
 
-      - name: Checkout Shared Workflows Repository
+      - name: Checkout Task3 Repository
         uses: actions/checkout@v3
         with:
-          repository: 'alinda-24/shared-workflows'  # Replace with your username/org and repo
-          path: 'shared-workflows'
+          repository: 'alinda-24/task3'  # Corrected repository reference
+          path: 'task3-workflows'
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 1
 
@@ -162,7 +162,7 @@ jobs:
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python shared-workflows/scripts/generate_tests.py "${{ secrets.OPENAI_TOKEN }}" "${{ needs.generate-solution.outputs.branch_name }}"
+          python task3-workflows/scripts/generate_tests.py "${{ secrets.OPENAI_TOKEN }}" "${{ needs.generate-solution.outputs.branch_name }}"
 
       - name: Set Branch Name
         id: set-branch-name
@@ -185,11 +185,11 @@ jobs:
           ref: ${{ needs.generate-solution.outputs.branch_name }}
           fetch-depth: 0  # Ensure full history
 
-      - name: Checkout Shared Workflows Repository
+      - name: Checkout Task3 Repository
         uses: actions/checkout@v3
         with:
-          repository: 'alinda-24/shared-workflows'  # Replace with your username/org and repo
-          path: 'shared-workflows'
+          repository: 'alinda-24/task3'  # Corrected repository reference
+          path: 'task3-workflows'
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 1
 
@@ -208,7 +208,7 @@ jobs:
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python shared-workflows/scripts/adversarial_review.py "${{ secrets.OPENAI_TOKEN }}" "tasks/new_task.md" ".hidden_tasks"
+          python task3-workflows/scripts/adversarial_review.py "${{ secrets.OPENAI_TOKEN }}" "tasks/new_task.md" ".hidden_tasks"
 
   adversarial-test-review:
     name: Adversarial Review - Improve Tests
@@ -221,11 +221,11 @@ jobs:
           ref: ${{ needs.generate-tests.outputs.branch_name }}
           fetch-depth: 0  # Ensure full history
 
-      - name: Checkout Shared Workflows Repository
+      - name: Checkout Task3 Repository
         uses: actions/checkout@v3
         with:
-          repository: 'alinda-24/shared-workflows'  # Replace with your username/org and repo
-          path: 'shared-workflows'
+          repository: 'alinda-24/task3'  # Corrected repository reference
+          path: 'task3-workflows'
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 1
 
@@ -244,7 +244,7 @@ jobs:
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python shared-workflows/scripts/adversarial_tests.py "${{ secrets.OPENAI_TOKEN }}" "gen_test"
+          python task3-workflows/scripts/adversarial_tests.py "${{ secrets.OPENAI_TOKEN }}" "gen_test"
 
   generate-template-code:
     name: Generate Template Code
@@ -257,11 +257,11 @@ jobs:
           ref: ${{ needs.adversarial-review.outputs.branch_name }}
           fetch-depth: 0  # Ensure full history
 
-      - name: Checkout Shared Workflows Repository
+      - name: Checkout Task3 Repository
         uses: actions/checkout@v3
         with:
-          repository: 'alinda-24/shared-workflows'  # Replace with your username/org and repo
-          path: 'shared-workflows'
+          repository: 'alinda-24/task3'  # Corrected repository reference
+          path: 'task3-workflows'
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 1
 
@@ -280,4 +280,4 @@ jobs:
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python shared-workflows/scripts/generate_template_code.py "${{ secrets.OPENAI_TOKEN }}" "${{ needs.adversarial-review.outputs.branch_name }}"
+          python task3-workflows/scripts/generate_template_code.py "${{ secrets.OPENAI_TOKEN }}" "${{ needs.adversarial-review.outputs.branch_name }}"
