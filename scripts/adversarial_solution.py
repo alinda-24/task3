@@ -76,11 +76,11 @@ def main(api_key, task_file, solution_dir):
     # Commit and push changes with the diff summary in commit message
     commit_and_push_changes(diff_summary)
 
-def generate_with_retries(prompt, max_retries=3):
+def generate_with_retries(client, prompt, max_retries=3):
     for attempt in range(max_retries):
         try:
-            response = openai.ChatCompletion.create(
-                model="gpt-4o-2024-08-06",  # Replace with the correct model name if needed
+            response = client.chat.completions.create(
+                model="gpt-4o-2024-08-06",
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": prompt}
@@ -88,9 +88,9 @@ def generate_with_retries(prompt, max_retries=3):
             )
             return response.choices[0].message.content.strip()
         except Exception as e:
-            print(f"Error generating improved solution: {e}", file=sys.stderr)
+            print(f"Error generating solution code: {e}")
             if attempt < max_retries - 1:
-                print("Retrying...", file=sys.stderr)
+                print("Retrying...")
     return None
 
 def write_improved_solution(directory, improved_solution):

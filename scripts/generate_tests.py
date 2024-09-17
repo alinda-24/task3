@@ -37,107 +37,90 @@ def main(api_key, branch_name):
 
     # Example tests to inspire the model (not to be directly copied)
     example_tests = """
-    
-        "import org.junit.BeforeClass;
-        import org.junit.Test;
+    package original;
+    import org.junit.Before;
+    import org.junit.Test;
+    import static org.junit.Assert.*;
 
-        import static org.junit.Assert.assertEquals;
-        import static org.junit.Assert.assertFalse;
-        import static org.junit.Assert.assertTrue;
+    public class IndamonTest {
+        private Indamon indamon1;
+        private Indamon indamon2;
 
-        public class RectangleTest {
-
-            public static final int RECT_WIDTH = 40;
-            public static final int RECT_HEIGHT = 50;
-            public static final int SQUARE_SIDE = 20;
-
-            public static final double DIAGNONAL_ERROR_MARGIN = 0.1;
-
-            private static Rectangle rectangle;
-            private static Rectangle square;
-
-            @BeforeClass
-            public static void setUp() {
-                rectangle = new Rectangle();
-                rectangle.setWidth(RECT_WIDTH);
-                rectangle.setHeight(RECT_HEIGHT);
-
-                square = new Rectangle();
-                square.setWidth(SQUARE_SIDE);
-                square.setHeight(SQUARE_SIDE);
-            }
-
-            @Test
-            public void testRectangleArea() {
-                assertEquals(RECT_WIDTH * RECT_HEIGHT, rectangle.area());
-            }
-
-            @Test
-            public void testSquareArea() {
-                assertEquals(SQUARE_SIDE * SQUARE_SIDE, square.area());
-            }
-
-            @Test
-            public void testRectangleDiagonalLength() {
-                double expectedDiagonal = Math.sqrt(RECT_WIDTH * RECT_WIDTH + RECT_HEIGHT * RECT_HEIGHT);
-                assertEquals(expectedDiagonal, rectangle.diagonalLength(), DIAGNONAL_ERROR_MARGIN);
-            }
-
-            @Test
-            public void testSquareDiagonalLength() {
-                double expectedDiagonal = Math.sqrt(SQUARE_SIDE * SQUARE_SIDE * 2);
-                assertEquals(expectedDiagonal, square.diagonalLength(), DIAGNONAL_ERROR_MARGIN);
-            }
-
-            @Test
-            public void testRectangleIsSquare() {
-                assertFalse(rectangle.isSquare());
-            }
-
-            @Test
-            public void testSquareIsSquare() {
-                assertTrue(square.isSquare());
-            }
-        }"
-
-        "
-        import org.junit.Test;
-        import static org.junit.Assert.assertEquals;
-        import static org.junit.Assert.assertTrue;
-        import static org.junit.Test.None;
-
-        public class TriangleTest {
-            @Test(expected = Test.None.class)
-            public void validTriangleIsValid() {
-                new Triangle(1, 1, 1);
-            }
-
-            @Test(expected = IllegalArgumentException.class)
-            public void invalidTriangleIsInvalid() {
-                new Triangle(1, 1, 5);
-            }
-
-            @Test
-            public void testTriangleTypeEquilateral() {
-                Triangle t = new Triangle(1, 1, 1);
-                assertEquals(t.getTriangleType(), "Equilateral");
-            }
-
-            @Test
-            public void testTriangleTypeIsosceles() {
-                Triangle t = new Triangle(2, 2, 1);
-                assertEquals(t.getTriangleType(), "Isosceles");
-            }
-
-            @Test
-            public void testTriangleTypeScalene() {
-                Triangle t = new Triangle(2, 3, 4);
-                assertEquals(t.getTriangleType(), "Scalene");
-            }
+        @Before
+        public void setUp() {
+            indamon1 = new Indamon("Glassey", 10, 5, 5);
+            indamon2 = new Indamon("Siberov", 10, 5, 5);
         }
-        "
 
+        @Test
+        public void testGetName() {
+            assertEquals("Glassey", indamon1.getName());
+            assertEquals("Siberov", indamon2.getName());
+        }
 
+        @Test
+        public void testGetHp() {
+            assertEquals(10, indamon1.getHp());
+            assertEquals(10, indamon2.getHp());
+        }
+
+        @Test
+        public void testGetAttack() {
+            assertEquals(5, indamon1.getAttack());
+            assertEquals(5, indamon2.getAttack());
+        }
+
+        @Test
+        public void testGetDefense() {
+            assertEquals(5, indamon1.getDefense());
+            assertEquals(5, indamon2.getDefense());
+        }
+
+        @Test
+        public void testGetFainted() {
+            assertEquals(false, indamon1.getFainted());
+            assertEquals(false, indamon2.getFainted());
+        }
+
+        @Test
+        public void testSetName() {
+            indamon1.setName("NewName");
+            assertEquals("NewName", indamon1.getName());
+        }
+
+        @Test
+        public void testSetHp() {
+            indamon1.setHp(20);
+            assertEquals(20, indamon1.getHp());
+        }
+
+        @Test
+        public void testSetAttack() {
+            indamon1.setAttack(7);
+            assertEquals(7, indamon1.getAttack());
+        }
+
+        @Test
+        public void testSetDefense() {
+            indamon1.setDefense(8);
+            assertEquals(8, indamon1.getDefense());
+        }
+
+        @Test
+        public void testSetFainted() {
+            indamon1.setFainted(true);
+            assertEquals(true, indamon1.getFainted());
+        }
+
+        @Test
+        public void testAttack() {
+            indamon1 = new Indamon("Glassey", 10, 5, 5);
+            indamon2 = new Indamon("Siberov", 10, 5, 5);
+            indamon1.attack(indamon2);
+            assertEquals(9, indamon2.getHp()); 
+            assertEquals(false, indamon2.getFainted());
+        }
+    }
     """
 
     # Combine the solution into a single prompt for test generation
@@ -166,7 +149,7 @@ def generate_with_retries(client, prompt, max_retries=3):
     for attempt in range(max_retries):
         try:
             response = client.chat.completions.create(
-                model="o1-mini",
+                model="gpt-4o-2024-08-06",
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": prompt}

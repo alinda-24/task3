@@ -4,26 +4,23 @@ import os
 import re
 import sys
 import subprocess
-from datetime import datetime
-import openai  # Correct import
-import pytz
-from pytz import timezone
+from openai import OpenAI
 
 def main(api_key, branch_name):
     if not api_key:
-        print("Error: OpenAI API key is missing.", file=sys.stderr)
+        print("Error: OpenAI API key is missing.")
         sys.exit(1)
 
-    # Set the OpenAI API key
-    openai.api_key = api_key
+    client = OpenAI(api_key=api_key)
 
     # Read the new task description
     try:
         with open("tasks/new_task.md", "r") as file:
             task_description = file.read()
     except FileNotFoundError:
-        print("Error: new_task.md file not found.", file=sys.stderr)
+        print("Error: new_task.md file not found.")
         sys.exit(1)
+
 
     # Inspirational code snippet for the solution
     inspirational_code = """
@@ -191,13 +188,13 @@ def main(api_key, branch_name):
     )
 
     # Call OpenAI API to generate the solution code
-    response_content = generate_with_retries(prompt, max_retries=3)
+    response_content = generate_with_retries(client, prompt, max_retries=3)
     if response_content is None:
-        print("Error: Failed to generate solution code after multiple retries.", file=sys.stderr)
+        print("Error: Failed to generate solution code after multiple retries.")
         sys.exit(1)
 
     # Ensure the .hidden_tasks directory exists
-    hidden_tasks_dir = ".hidden_tasks"
+    hidden_tasks_dir = os.path.join(".hidden_tasks")
     os.makedirs(hidden_tasks_dir, exist_ok=True)
 
     # Write the generated code to Java files
@@ -205,9 +202,6 @@ def main(api_key, branch_name):
 
     # Commit and push changes
     commit_and_push_changes(branch_name, hidden_tasks_dir)
-
-    # Output the branch name for the next job (if needed)
-    print(f"branch_name={branch_name}", file=sys.stdout)
 
 def write_generated_code_to_files(directory, code_content):
     """
@@ -217,19 +211,18 @@ def write_generated_code_to_files(directory, code_content):
     """
     leftover_content = ""  # To capture leftover content before the first class
     current_imports = ""   # To capture and carry over import statements
-    # Split on different class declarations (public class, abstract class, etc.)
-    file_blocks = re.split(r'\b(public\s+class|abstract\s+class|final\s+class|class)\b', code_content)
+    file_blocks = re.split(r'\b(class|public\s+class|abstract\s+class|final\s+class)\b', code_content)  # Split on different class declarations
 
     for i in range(1, len(file_blocks), 2):  # Iterate over every class block
         class_declaration = file_blocks[i] + file_blocks[i + 1]  # Reattach split 'class' or 'public class'
         block = leftover_content + class_declaration
 
         # Extract class name
-        class_name_match = re.search(r'class\s+([A-Za-z_]\w*)\s*{', block)
+        class_name_match = re.search(r'class\s+([A-Za-z_]\w*)\s*{', block)  # Match 'class ClassName {'
         if class_name_match:
-            class_name = class_name_match.group(1)
+            class_name = class_name_match.group(1)  # Extract the class name
         else:
-            print(f"Skipping block due to missing class name in block: {block[:50]}", file=sys.stderr)
+            print(f"Skipping block due to missing class name in block: {block[:50]}")
             continue
 
         # Clean up the block, removing content after the last closing brace
@@ -254,15 +247,18 @@ def write_generated_code_to_files(directory, code_content):
                 java_file.write(cleaned_block)
             print(f"Successfully wrote {file_name}")
         except IOError as e:
-            print(f"Error writing file {file_name}: {e}", file=sys.stderr)
+            print(f"Error writing file {file_name}: {e}")
 
 def clean_class_block(block):
     """Ensure the block only contains content until the last closing brace."""
+    
     # Find the position of the last closing brace '}' in the block
     last_closing_brace = block.rfind("}")
+    
     if last_closing_brace != -1:
         # Truncate the block at the last closing brace
         block = block[:last_closing_brace + 1]
+    
     return block
 
 def check_and_add_missing_imports(block):
@@ -277,8 +273,7 @@ def check_and_add_missing_imports(block):
         "Scanner": "import java.util.Scanner;",
         "Set": "import java.util.Set;",
         "HashSet": "import java.util.HashSet;",
-        "Random": "import java.util.Random;",
-        "Math": "import java.lang.Math;"
+        "Random": "import java.util.Random;"
     }
 
     # Extract existing imports from the block
@@ -296,10 +291,10 @@ def check_and_add_missing_imports(block):
 
     return block
 
-def generate_with_retries(prompt, max_retries=3):
+def generate_with_retries(client, prompt, max_retries=3):
     for attempt in range(max_retries):
         try:
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model="gpt-4o-2024-08-06",
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
@@ -308,9 +303,9 @@ def generate_with_retries(prompt, max_retries=3):
             )
             return response.choices[0].message.content.strip()
         except Exception as e:
-            print(f"Error generating solution code: {e}", file=sys.stderr)
+            print(f"Error generating solution code: {e}")
             if attempt < max_retries - 1:
-                print("Retrying...", file=sys.stderr)
+                print("Retrying...")
     return None
 
 def commit_and_push_changes(branch_name, directory_path):
@@ -323,23 +318,17 @@ def commit_and_push_changes(branch_name, directory_path):
         subprocess.run(
             ["git", "push", "--set-upstream", "origin", branch_name],
             check=True,
-            env={
-                **os.environ,
-                "GIT_ASKPASS": "echo",
-                "GIT_USERNAME": "x-access-token",
-                "GIT_PASSWORD": os.getenv('GITHUB_TOKEN')
-            }
+            env=dict(os.environ, GIT_ASKPASS='echo', GIT_USERNAME='x-access-token', GIT_PASSWORD=os.getenv('GITHUB_TOKEN'))
         )
     except subprocess.CalledProcessError as e:
-        print(f"Error committing and pushing changes: {e}", file=sys.stderr)
+        print(f"Error committing and pushing changes: {e}")
         sys.exit(1)
 
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Error: Missing required command line arguments 'api_key' and 'branch_name'", file=sys.stderr)
-        sys.exit(1)
+if len(sys.argv) != 3:
+    print("Error: Missing required command line arguments 'api_key' and 'branch_name'")
+    sys.exit(1)
 
-    api_key = sys.argv[1]
-    branch_name = sys.argv[2]
+api_key = sys.argv[1]
+branch_name = sys.argv[2]
 
-    main(api_key, branch_name)
+main(api_key, branch_name)

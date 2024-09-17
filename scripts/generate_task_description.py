@@ -130,10 +130,10 @@ def main(api_key):
     # Output the branch name for the next job
     print(f"branch_name={branch_name}", file=sys.stdout)
 
-def generate_with_retries(prompt, max_retries=3):
+def generate_with_retries(client, prompt, max_retries=3):
     for attempt in range(max_retries):
         try:
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model="gpt-4o-2024-08-06",
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
@@ -142,9 +142,9 @@ def generate_with_retries(prompt, max_retries=3):
             )
             return response.choices[0].message.content.strip()
         except Exception as e:
-            print(f"Error generating task description: {e}", file=sys.stderr)
+            print(f"Error generating task description: {e}")
             if attempt < max_retries - 1:
-                print("Retrying...", file=sys.stderr)
+                print("Retrying...")
     return None
 
 def create_branch(branch_name):
