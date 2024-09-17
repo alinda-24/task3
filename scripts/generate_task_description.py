@@ -191,9 +191,11 @@ def commit_and_push_changes(branch_name, task_file_path):
         sys.exit(1)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Error: Missing required command line argument 'api_key'", file=sys.stderr)
+    if len(sys.argv) != 3:
+        print("Error: Missing required command line arguments 'api_key' and 'branch_name'", file=sys.stderr)
         sys.exit(1)
 
     api_key = sys.argv[1]
-    main(api_key)
+    branch_name = sys.argv[2]
+
+    main(api_key, branch_name)
