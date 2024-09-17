@@ -257,11 +257,21 @@ def generate_with_retries(client, prompt, max_retries=3):
 
 def create_branch(branch_name):
     try:
+        github_token = os.getenv('GITHUB_TOKEN')
+        if not github_token:
+            print("Error: GITHUB_TOKEN environment variable is not set.")
+            sys.exit(1)
+            
         subprocess.run(["git", "checkout", "-b", branch_name], check=True)
         subprocess.run(
             ["git", "push", "-u", "origin", branch_name],
             check=True,
-            env=dict(os.environ, GIT_ASKPASS='echo', GIT_USERNAME='x-access-token', GIT_PASSWORD=os.getenv('GITHUB_TOKEN'))
+            env={
+                **os.environ,
+                "GIT_ASKPASS": "echo",
+                "GIT_USERNAME": "x-access-token",
+                "GIT_PASSWORD": github_token  # Use the fetched GITHUB_TOKEN
+            }
         )
     except subprocess.CalledProcessError as e:
         print(f"Error creating branch: {e}")
@@ -269,6 +279,11 @@ def create_branch(branch_name):
 
 def commit_and_push_changes(branch_name, task_file_path):
     try:
+        github_token = os.getenv('GITHUB_TOKEN')
+        if not github_token:
+            print("Error: GITHUB_TOKEN environment variable is not set.")
+            sys.exit(1)
+
         subprocess.run(["git", "config", "--global", "user.email", "actions@github.com"], check=True)
         subprocess.run(["git", "config", "--global", "user.name", "github-actions"], check=True)
 
@@ -277,7 +292,12 @@ def commit_and_push_changes(branch_name, task_file_path):
         subprocess.run(
             ["git", "push", "--set-upstream", "origin", branch_name],
             check=True,
-            env=dict(os.environ, GIT_ASKPASS='echo', GIT_USERNAME='x-access-token', GIT_PASSWORD=os.getenv('GITHUB_TOKEN'))
+            env={
+                **os.environ,
+                "GIT_ASKPASS": "echo",
+                "GIT_USERNAME": "x-access-token",
+                "GIT_PASSWORD": github_token  # Use the fetched GITHUB_TOKEN
+            }
         )
     except subprocess.CalledProcessError as e:
         print(f"Error committing and pushing changes: {e}")
