@@ -66,7 +66,7 @@ def generate_with_retries(prompt, max_retries=3):
     for attempt in range(max_retries):
         try:
             response = openai.ChatCompletion.create(
-                model="gpt-4",  # Replace with the correct model name if needed
+                model="gpt-4o-2024-08-06",  # Replace with the correct model name if needed
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": prompt}
