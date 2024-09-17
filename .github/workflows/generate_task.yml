@@ -31,23 +31,10 @@ permissions:
 
 jobs:
   generate-task-description:
-    name: Generate Task Description
     runs-on: ubuntu-latest
-    outputs:
-      branch_name: ${{ steps.set-branch-name.outputs.branch_name }}
     steps:
       - name: Checkout Caller Repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Ensure full history for branch operations
-
-      - name: Checkout Task3 Repository
-        uses: actions/checkout@v3
-        with:
-          repository: 'alinda-24/task3'  # Correct repository reference
-          path: 'task3-workflows'        # Changed path to avoid confusion
-          token: ${{ github.token }}      # Use github.token instead of secrets.GITHUB_TOKEN
-          fetch-depth: 1
 
       - name: Set Up Python
         uses: actions/setup-python@v4
@@ -60,18 +47,14 @@ jobs:
           pip install openai pytz
 
       - name: Generate Task Description
-        id: generate-task-description
         env:
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Set GITHUB_TOKEN as an environment variable
           TASK_DIFFICULTY: ${{ inputs.difficulty }}
           TASK_THEME: ${{ inputs.theme }}
           TASK_LANGUAGE: ${{ inputs.language }}
         run: |
           python task3-workflows/scripts/generate_task_description.py "${{ secrets.OPENAI_TOKEN }}"
-
-      - name: Set Branch Name
-        id: set-branch-name
-        run: echo "branch_name=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_OUTPUT
 
   generate-solution:
     name: Generate Solution
