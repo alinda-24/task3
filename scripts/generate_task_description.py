@@ -8,7 +8,7 @@ from pytz import timezone
 
 def main(api_key):
     if not api_key:
-        print("Error: OpenAI API key is missing.")
+        print("Error: OpenAI API key is missing.", file=sys.stderr)
         sys.exit(1)
 
     # Set the OpenAI API key
@@ -27,7 +27,6 @@ def main(api_key):
     * Printing to the terminal
     * Using the `main` method
     * Scope (or variable shadowing)
-
     """
 
     original_structure = """
@@ -108,7 +107,7 @@ def main(api_key):
     # Call OpenAI API to generate the task description
     response_content = generate_with_retries(prompt, max_retries=3)
     if response_content is None:
-        print("Error: Failed to generate task description after multiple retries.")
+        print("Error: Failed to generate task description after multiple retries.", file=sys.stderr)
         sys.exit(1)
 
     # Create a new branch with a unique name
@@ -191,11 +190,10 @@ def commit_and_push_changes(branch_name, task_file_path):
         sys.exit(1)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Error: Missing required command line arguments 'api_key' and 'branch_name'", file=sys.stderr)
+    if len(sys.argv) != 2:
+        print("Error: Missing required command line argument 'api_key'", file=sys.stderr)
         sys.exit(1)
 
     api_key = sys.argv[1]
-    branch_name = sys.argv[2]
 
-    main(api_key, branch_name)
+    main(api_key)

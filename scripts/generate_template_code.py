@@ -1,10 +1,7 @@
-# shared-workflows/scripts/generate_template_code.py
-
 import os
-import re
 import sys
 import subprocess
-import openai  # Corrected import
+import openai
 
 def main(api_key, branch_name):
     if not api_key:
@@ -14,16 +11,10 @@ def main(api_key, branch_name):
     # Set the OpenAI API key
     openai.api_key = api_key
 
-    # Read the existing solution code from the .hidden_tasks directory
-    solution_dir = ".hidden_tasks"
-    solution_files = []
-    try:
-        for filename in os.listdir(solution_dir):
-            if filename.endswith(".java"):
-                with open(os.path.join(solution_dir, filename), "r") as file:
-                    solution_files.append((filename, file.read()))
-    except FileNotFoundError:
-        print(f"Error: Solution directory '{solution_dir}' not found.", file=sys.stderr)
+    # Access GITHUB_TOKEN from environment
+    github_token = os.getenv('GITHUB_TOKEN')
+    if not github_token:
+        print("Error: GITHUB_TOKEN is missing.", file=sys.stderr)
         sys.exit(1)
 
     if not solution_files:
